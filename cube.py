@@ -20,11 +20,17 @@ class Cube_wire(object):
         self.color = colors.YELLOW
         self.pos = calc_pos(coords)
         self.coords = coords
+        self.function = "WIRE"
 
         self.image = pygame.surface.Surface((width, height))
         self.image.fill(self.color)
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
+
+        self.top_cube = None
+        self.bottom_cube = None
+        self.left_cube = None
+        self.right_cube = None
 
     def update(self):
         if self.active:
@@ -44,11 +50,17 @@ class Cube_input(object):
         self.color = colors.RED
         self.pos = calc_pos(coords)
         self.coords = coords
+        self.function = "INPUT"
 
         self.image = pygame.surface.Surface((width, height))
         self.image.fill(self.color)
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
+
+        self.top_cube = None
+        self.bottom_cube = None
+        self.left_cube = None
+        self.right_cube = None
 
     def update(self):
         if self.active:
@@ -68,11 +80,17 @@ class Cube_var(object):
         self.color = colors.GREEN
         self.pos = calc_pos(coords)
         self.coords = coords
+        self.function = "VAR"
 
         self.image = pygame.surface.Surface((width, height))
         self.image.fill(self.color)
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
+
+        self.top_cube = None
+        self.bottom_cube = None
+        self.left_cube = None
+        self.right_cube = None
 
     def update(self):
         if self.active:
