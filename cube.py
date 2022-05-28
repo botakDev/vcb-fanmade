@@ -27,10 +27,7 @@ class Cube_wire(object):
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
 
-        self.top_cube = None
-        self.bottom_cube = None
-        self.left_cube = None
-        self.right_cube = None
+        self.part_id = None
 
     def update(self):
         if self.active:
@@ -57,11 +54,6 @@ class Cube_input(object):
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
 
-        self.top_cube = None
-        self.bottom_cube = None
-        self.left_cube = None
-        self.right_cube = None
-
     def update(self):
         if self.active:
             self.color = colors.RED
@@ -86,11 +78,6 @@ class Cube_var(object):
         self.image.fill(self.color)
         self.rect = self.image.get_rect()
         self.rect.topleft = self.pos
-
-        self.top_cube = None
-        self.bottom_cube = None
-        self.left_cube = None
-        self.right_cube = None
 
     def update(self):
         if self.active:

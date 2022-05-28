@@ -1,75 +1,92 @@
 from pygame.math import Vector2
+import parts
 
-cubes = []
+part_list = []
 
 def add(new_cube):
     coords = new_cube.coords
-    cubes.append(new_cube)
 
+    top = coords + Vector2(0, -1)
+    bottom = coords + Vector2(0, 1)
+    left = coords + Vector2(-1, 0)
+    right = coords + Vector2(1, 0)
 
-    update_env(coords + Vector2(0, -1))
-    update_env(coords + Vector2(0, 1))
-    update_env(coords + Vector2(-1, 0))
-    update_env(coords + Vector2(1, 0))
-    update_env(coords)
+    if find_at(top) is not None:
+            part_list[find_part(top)].add(new_cube)
+    elif find_at(bottom) is not None:
+            part_list[find_part(bottom)].add(new_cube)
+    elif find_at(left) is not None:
+            part_list[find_part(left)].add(new_cube)
+    elif find_at(right) is not None:
+            part_list[find_part(right)].add(new_cube)
+    else:
+        new_part = parts.Part()
+        new_part.add(new_cube)
+        part_list.append(new_part)
 
-def remove_at(coords):
-    for i in range(len(cubes)):
-        if cubes[i].coords == coords:
-            cubes.pop(i)
-            break
+    for i in range(4):
+        check_touching_parts(coords)
 
-    for i in range(len(cubes)):
-        cube_coords = cubes[i].coords
-        update_env(cube_coords + Vector2(0, -1))
-        update_env(cube_coords + Vector2(0, 1))
-        update_env(cube_coords + Vector2(-1, 0))
-        update_env(cube_coords + Vector2(1, 0))
-        update_env(cube_coords)
+    print(part_list)
+
+def delete(coords):
+    part_list[find_part(coords)].delete(coords)
 
 def find_at(coords):
-    for i in range(len(cubes)):
-        if cubes[i].coords == coords:
-            return i
-    return False
+    for part in part_list:
+        if part.find_at(coords) is not None:
+            return part.find_at(coords)
+    return None
 
-def reset_cubes():
-    for i in range(len(cubes)):
-        if cubes[i].function == "WIRE":
-            cubes[i].active = False
+def find_part(coords):
+    for part in part_list:
+        if part.find_at(coords) is not None:
+            return part_list.index(part)
+    return None
 
-def turn_on_cubes():
-    for i in range(len(cubes)):
-        cubes[i].active = True
+def find_cube(cube_to_find):
+    for part in part_list:
+        if part.find_cube(cube_to_find) is not None:
+            return part.find_cube(cube_to_find)
+    return None
 
-def update_env(coords):
-    cube_id = find_at(coords)
-    if cube_id is not False:
-        cubes[cube_id].top_cube = find_at(coords + Vector2(0, -1))
-        cubes[cube_id].bottom_cube = find_at(coords + Vector2(0, 1))
-        cubes[cube_id].left_cube = find_at(coords + Vector2(-1, 0))
-        cubes[cube_id].right_cube = find_at(coords + Vector2(1, 0))
+def check_touching_parts(coords):
+    top = coords + Vector2(0, -1)
+    bottom = coords + Vector2(0, 1)
+    left = coords + Vector2(-1, 0)
+    right = coords + Vector2(1, 0)
 
+    if find_part(coords) is not find_part(top) \
+            and find_part(top) is not None:
+        split_parts(find_part(coords), find_part(top))
+
+    if find_part(coords) is not find_part(bottom) \
+            and find_part(bottom) is not None:
+        split_parts(find_part(coords), find_part(bottom))
+
+    if find_part(coords) is not find_part(left) \
+            and find_part(left) is not None:
+        split_parts(find_part(coords), find_part(left))
+
+    if find_part(coords) is not find_part(right) \
+            and find_part(right) is not None:
+        split_parts(find_part(coords), find_part(right))
+
+
+def split_parts(part_id, target_part_id):
+    giver_id = target_part_id
+    target_id = part_id
+    part_list[target_id].add_multiple(part_list[giver_id].cubes)
+    part_list.pop(giver_id)
 
 def update():
-    for cube in cubes:
-        cube.update()
+    for part in part_list:
+        part.update()
 
-    for j in range(len(cubes)):
-        for i in range(len(cubes)):
-            cube = cubes[i]
-
-            if cube.active:
-                if cube.top_cube is not False:
-                    cubes[cube.top_cube].active = True
-                if cube.bottom_cube is not False:
-                    cubes[cube.bottom_cube].active = True
-                if cube.left_cube is not False:
-                    cubes[cube.left_cube].active = True
-                if cube.right_cube is not False:
-                    cubes[cube.right_cube].active = True
-
+def reset_cubes():
+    for part in part_list:
+        part_list[part_list.index(part)].active = False
 
 def draw():
-    for cube in cubes:
-        cube.draw()
+    for part in part_list:
+        part.draw()
