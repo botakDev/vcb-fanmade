@@ -12,7 +12,7 @@ rows, columns = int(window_width / cube.width), int(window_height / cube.width)
 clock = pygame.time.Clock()
 
 #game
-game_run = False
+game_run = True
 
 #input
 input_update = True
@@ -31,15 +31,14 @@ def create_cube():
         new_cube = cube.Cube_var(coords)
     elif selected_cube == "WIRE":
         new_cube = cube.Cube_wire(coords)
-    if cubes.find_at(coords) == False:
+    if cubes.find_at(coords) is None:
         cubes.add(new_cube)
 
 def delete_cube():
     mouse_pos = Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
     coords = cube.calc_coords(mouse_pos)
-    if cubes.find_at(coords) != False:
-        cubes.remove_at(coords)
-
+    if cubes.find_at(coords) is not None:
+        cubes.delete(coords)
 
 class Button(object):
     def __init__(self, pos, function, type, color, size, surface_pos):
@@ -114,13 +113,12 @@ while True:
 
     if game_run:
         cubes.update()
-    else:
-        if mouse_clicked:
-            if pygame.mouse.get_pos()[1] < 790:
-                if delete_on:
-                    delete_cube()
-                else:
-                    create_cube()
+    if mouse_clicked:
+        if pygame.mouse.get_pos()[1] < 790:
+            if delete_on:
+                delete_cube()
+            else:
+                create_cube()
 
     for event in events:
         if event.type == pygame.QUIT:
@@ -141,9 +139,7 @@ while True:
                         if game_run:
                             cubes.reset_cubes()
                             bottom_panel.change_btn_color("RUN", "FUNCTION", colors.RED_DARK)
-                            cubes.update()
                         else:
-                            cubes.turn_on_cubes()
                             bottom_panel.change_btn_color("RUN", "FUNCTION", colors.GREEN_LIGHT)
 
     window.fill(colors.BLACK)
