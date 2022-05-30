@@ -1,23 +1,20 @@
 class Part(object):
-    def __init__(self):
+    def __init__(self, function):
+        self.function = function
         self.active = False
         self.cubes = []
 
     def update(self):
-        self.active = self.input_active()
         for cube in self.cubes:
-            if cube.function == "WIRE":
-                cube.active = self.active
-            cube.update()
-
-    def input_active(self):
-        for cube in self.cubes:
-            if cube.function == "INPUT":
-                return cube.active
-        return False
+            cube_id = self.cubes.index(cube)
+            if self.function != "VAR":
+                self.cubes[cube_id].active = self.active
+            self.cubes[cube_id].update()
 
     def add(self, cube):
         self.cubes.append(cube)
+        if cube.function == "VAR":
+            self.active = True
 
     def add_multiple(self, cubes):
         for cube in cubes:
@@ -42,4 +39,3 @@ class Part(object):
     def draw(self):
         for cube in self.cubes:
             cube.draw()
-            print(cube.active)

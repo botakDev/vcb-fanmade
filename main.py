@@ -4,23 +4,24 @@ import cube
 import cubes
 import colors
 
-#settings
+# settings
 window_width, window_height = 1600, 900
 window = pygame.display.set_mode((window_width, window_height))
 rows, columns = int(window_width / cube.width), int(window_height / cube.width)
 
 clock = pygame.time.Clock()
 
-#game
+# game
 game_run = True
 
-#input
+# input
 input_update = True
 
-#cubes
+# cubes
 cube.window = window
 selected_cube = "WIRE"
 delete_on = False
+
 
 def create_cube():
     mouse_pos = Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
@@ -31,14 +32,18 @@ def create_cube():
         new_cube = cube.Cube_var(coords)
     elif selected_cube == "WIRE":
         new_cube = cube.Cube_wire(coords)
+    elif selected_cube == "NOT":
+        new_cube = cube.Cube_not(coords)
     if cubes.find_at(coords) is None:
         cubes.add(new_cube)
+
 
 def delete_cube():
     mouse_pos = Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
     coords = cube.calc_coords(mouse_pos)
     if cubes.find_at(coords) is not None:
         cubes.delete(coords)
+
 
 class Button(object):
     def __init__(self, pos, function, type, color, size, surface_pos):
@@ -91,7 +96,8 @@ class Panel(object):
             self.buttons[i].draw(self.panel_surface)
         window.blit(self.panel_surface, self.pos)
 
-#panel
+
+# panel
 bottom_panel = Panel(Vector2(0, 800), 1600, 100)
 input_btn = Button(Vector2(25, 25), "INPUT", "CUBE_TYPE", colors.RED, (50, 50), bottom_panel.pos)
 bottom_panel.add_btn(input_btn)
@@ -99,12 +105,14 @@ var_btn = Button(Vector2(75, 25), "VAR", "CUBE_TYPE", colors.GREEN, (50, 50), bo
 bottom_panel.add_btn(var_btn)
 wire_btn = Button(Vector2(125, 25), "WIRE", "CUBE_TYPE", colors.YELLOW, (50, 50), bottom_panel.pos)
 bottom_panel.add_btn(wire_btn)
-delete_btn = Button(Vector2(175, 25), "DEL", "FUNCTION", colors.WHITE, (50, 50), bottom_panel.pos)
+not_btn = Button(Vector2(175, 25), "NOT", "CUBE_TYPE", colors.BLUE, (50, 50), bottom_panel.pos)
+bottom_panel.add_btn(not_btn)
+delete_btn = Button(Vector2(225, 25), "DEL", "FUNCTION", colors.WHITE, (50, 50), bottom_panel.pos)
 bottom_panel.add_btn(delete_btn)
-run_btn = Button(Vector2(275, 25), "RUN", "FUNCTION", colors.GREEN_LIGHT, (50, 50), bottom_panel.pos)
+run_btn = Button(Vector2(325, 25), "RUN", "FUNCTION", colors.GREEN_LIGHT, (50, 50), bottom_panel.pos)
 bottom_panel.add_btn(run_btn)
 
-#mouse
+# mouse
 mouse_clicked = False
 
 while True:

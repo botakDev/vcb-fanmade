@@ -3,34 +3,41 @@ import parts
 
 part_list = []
 
+def get_top(coords):
+    return coords + Vector2(0, -1)
+
+
+def get_bottom(coords):
+    return coords + Vector2(0, 1)
+
+
+def get_left(coords):
+    return coords + Vector2(-1, 0)
+
+
+def get_right(coords):
+    return coords + Vector2(1, 0)
+
 def add(new_cube):
     coords = new_cube.coords
+    new_part(new_cube)
 
-    top = coords + Vector2(0, -1)
-    bottom = coords + Vector2(0, 1)
-    left = coords + Vector2(-1, 0)
-    right = coords + Vector2(1, 0)
-
-    if find_at(top) is not None:
-            part_list[find_part(top)].add(new_cube)
-    elif find_at(bottom) is not None:
-            part_list[find_part(bottom)].add(new_cube)
-    elif find_at(left) is not None:
-            part_list[find_part(left)].add(new_cube)
-    elif find_at(right) is not None:
-            part_list[find_part(right)].add(new_cube)
-    else:
-        new_part = parts.Part()
-        new_part.add(new_cube)
-        part_list.append(new_part)
-
-    for i in range(4):
+    for _ in range(4):
         check_touching_parts(coords)
-
     print(part_list)
 
+
+def new_part(cube):
+    new_part = parts.Part(cube.function)
+    new_part.add(cube)
+    part_list.append(new_part)
+
+
 def delete(coords):
-    part_list[find_part(coords)].delete(coords)
+    part_id = find_part(coords)
+    part_list[part_id].delete(coords)
+    try_split_part(part_id)
+
 
 def find_at(coords):
     for part in part_list:
@@ -38,11 +45,13 @@ def find_at(coords):
             return part.find_at(coords)
     return None
 
+
 def find_part(coords):
     for part in part_list:
         if part.find_at(coords) is not None:
             return part_list.index(part)
     return None
+
 
 def find_cube(cube_to_find):
     for part in part_list:
@@ -50,42 +59,70 @@ def find_cube(cube_to_find):
             return part.find_cube(cube_to_find)
     return None
 
+def get_part(coords):
+    for part in part_list:
+        if part.find_at(coords) is not None:
+            return part
+
+
+def set_active(coords, active):
+    part_list[find_part(coords)].active = active
+
+
 def check_touching_parts(coords):
-    top = coords + Vector2(0, -1)
-    bottom = coords + Vector2(0, 1)
-    left = coords + Vector2(-1, 0)
-    right = coords + Vector2(1, 0)
+    top = get_top(coords)
+    bottom = get_bottom(coords)
+    left = get_left(coords)
+    right = get_right(coords)
 
     if find_part(coords) is not find_part(top) \
             and find_part(top) is not None:
-        split_parts(find_part(coords), find_part(top))
+        if part_list[find_part(top)].function == part_list[find_part(coords)].function:
+            connect_parts(find_part(coords), find_part(top))
 
     if find_part(coords) is not find_part(bottom) \
             and find_part(bottom) is not None:
-        split_parts(find_part(coords), find_part(bottom))
+        if part_list[find_part(bottom)].function == part_list[find_part(coords)].function:
+            connect_parts(find_part(coords), find_part(bottom))
 
     if find_part(coords) is not find_part(left) \
             and find_part(left) is not None:
-        split_parts(find_part(coords), find_part(left))
+        if part_list[find_part(left)].function == part_list[find_part(coords)].function:
+            connect_parts(find_part(coords), find_part(left))
 
     if find_part(coords) is not find_part(right) \
             and find_part(right) is not None:
-        split_parts(find_part(coords), find_part(right))
+        if part_list[find_part(right)].function == part_list[find_part(coords)].function:
+            connect_parts(find_part(coords), find_part(right))
 
 
-def split_parts(part_id, target_part_id):
+def connect_parts(part_id, target_part_id):
     giver_id = target_part_id
     target_id = part_id
     part_list[target_id].add_multiple(part_list[giver_id].cubes)
     part_list.pop(giver_id)
 
+
+def try_split_part(part_id):
+    main_part_id = part_id
+    for cube in part_list[main_part_id].cubes:
+        new_part(cube)
+    part_list.pop(main_part_id)
+
+    for part in part_list:
+        for cube in part.cubes:
+            check_touching_parts(cube.coords)
+
+
 def update():
     for part in part_list:
         part.update()
 
+
 def reset_cubes():
     for part in part_list:
         part_list[part_list.index(part)].active = False
+
 
 def draw():
     for part in part_list:
